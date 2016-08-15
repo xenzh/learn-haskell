@@ -120,3 +120,60 @@ initials firstname lastname = [f] ++ ". " ++ [l] ++ "."
 bmis :: (RealFloat a) => [(a, a)] -> [a]
 bmis xs = [ bmi w h | (w, h) <- xs ]
     where bmi weight height = weight / height ^ 2
+
+-- let <exp> in <exp> - localized bindings like where
+cylinder :: (RealFloat a) => a -> a -> a
+cylinder r h =
+    let sideArea = 2 * pi * r * h
+        topArea  = pi * r ^ 2
+    in  sideArea + 2 * topArea
+
+-- let-in vs where: let binding are expressions!
+letIn1 = 4 * (let a = 9 in a + 1) + 2
+letIn2 = [let square x = x * x in (square 5, square 3, square 2)]
+
+-- several inline let bindings are usually separated by ';'
+-- semicolon is optional
+-- also, you can pattern-match in let (hello, Rust)
+letIn3 = (let a = 100; b = 200; c = 300 in a * b * c, "Hey there!")
+letIn4 = (let (a, b, c) = (1, 2, 3) in a + b * c)
+
+-- let..in inside list comprehensions
+-- is visible to output function (right of |) and predicates
+bmis' :: (RealFloat a) => [(a, a)] -> [a]
+bmis' xs = [bmi | (w, h) <- xs, let bmi = w / h ^2 ]
+
+-- let is placed in predicates section, may be followed by actual predicates
+fatBmis :: (RealFloat a) => [(a, a)] -> [a]
+fatBmis xs = [bmi | (w, h) <- xs, bmi = w * h ^ 2, bmi >= 25.0]
+
+-- let bindings cannot be substituted by where, since
+-- they are expressions and don't span acress guards
+
+-- case expressions
+-- these two impls are the same (first is syntactic sugar)
+ceHead1 :: [a] -> a
+ceHead1 [] = error "No head for empty lists!"
+ceHead1 [x:_] = x
+
+ceHead2 :: [a] -> a
+ceHead2 xs = case xs of [] -> error "No head for empty lists!"
+                        (x:_) -> x
+
+-- general syntaX: case expression of pattern -> result
+--                                    pattern -> result
+
+-- not reserved to function parameters:
+ceDescr :: [a] -> String
+ceDescr xs = "The list is " ++ case xs of [] -> "empty."
+                                          [x] -> "a singleton list"
+                                          xs -> "a longer list"
+
+-- they can be everywhere, including sugared syntax for function definitions
+ceDescr' :: [a] -> String
+ceDescr xs = "The list is " ++ what xs
+    where what []  = "empty"
+          what [x] = "a singleton list"
+          what xs  = "a longer list"
+
+
