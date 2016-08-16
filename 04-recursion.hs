@@ -26,12 +26,14 @@ maximum'' (x:xs) = max x (maximum'' xs)
 -- generates a list of repeated values of certain length
 replicate' :: (Num i, Ord i) => i -> a -> [a]
 replicate' n x
-    | x <= 0    = []
+    | n <= 0    = []
     | otherwise = x:replicate' (n - 1) x
 
--- take. cuts a number from list by value
+-- take. takes n items from a listi
 take' :: (Num i, Ord i) => i -> [a] -> [a]
 take' n _
     | n <= 0 = []
 take' _ []   = []
 take' n (x:xs) = x : take' (n - 1) xs
+
+
